@@ -2,6 +2,7 @@
 
 #include <dtwrap/BaseContext.hpp>
 #include <dtwrap/Exception.hpp>
+#include <dtwrap/Type.hpp>
 
 #include <cstdint>
 
@@ -146,7 +147,6 @@ static void push(BaseContext::Ptr ctx, const (void*)& value) { duk_push_pointer(
 };
 */
 
-
 template<>
 struct Value<std::string> {
 	static bool is(BaseContext::Ptr ctx, duk_idx_t index) { return static_cast<bool>(duk_is_string(*ctx, index) != 0); }
@@ -155,6 +155,24 @@ struct Value<std::string> {
 	static std::string to(BaseContext::Ptr ctx, duk_idx_t index) { return std::string(duk_safe_to_string(*ctx, index)); }
 	static void push(BaseContext::Ptr ctx, const std::string& value) { duk_push_string(*ctx, value.c_str()); }
 };
+
+
+template<>
+struct Value<Type> {
+	static void push(BaseContext::Ptr ctx, const Type& value) 
+	{ 
+		switch (value)
+		{
+		case Type::UNDEFINED: duk_push_undefined(*ctx); break;
+		case Type::TNULL: duk_push_null(*ctx); break;
+		case Type::OBJECT: duk_push_object(*ctx); break;
+		case Type::PUSH_ARRAY: duk_push_array(*ctx); break;
+		default:
+			throw Exception("Cannot push primite object by type");
+		}
+	}
+};
+
 
 //
 // ValueCast

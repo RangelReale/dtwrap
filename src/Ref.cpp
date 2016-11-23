@@ -29,6 +29,20 @@ bool Ref::isFunction()
 	return duk_is_function(*_ctx, -1) != 0;
 }
 
+bool Ref::hasProp(const std::string &name)
+{
+	util::StackPop p(_ctx);
+	push();
+	return duk_has_prop_string(*_ctx, -1, name.c_str()) != 0;
+}
+
+bool Ref::delProp(const std::string &name)
+{
+	util::StackPop p(_ctx);
+	push();
+	return duk_del_prop_string(*_ctx, -1, name.c_str()) != 0;
+}
+
 duk_size_t Ref::length()
 {
 	util::StackPop p(_ctx);
@@ -101,6 +115,70 @@ Ref::Ptr Ref::getEnum()
 	util::StackPop p(_ctx);
 	push();
 	return Ref::Ptr(new RefEnum(_ctx, -1, _description));
+}
+
+Ref::Ptr Ref::putProp(const std::string &name, Ref::Ptr value)
+{
+	util::StackPop p(_ctx); // ref
+
+	// push current object
+	push();
+
+	// check if type os object coercible
+	if (!duk_is_object_coercible(*_ctx, -1))
+	{
+		std::stringstream smsg;
+		smsg << "Can't put property '" << name << "' in value of type '" << type() << "' (" << _description << ")";
+		throw Exception(smsg.str());
+	}
+
+	value->push();
+	duk_put_prop_string(*_ctx, -2, name.c_str());
+
+	// get prop to return
+	duk_get_prop_string(*_ctx, -1, name.c_str());
+	++p; // pop return value
+
+	// build description
+	std::stringstream desc;
+	desc << _description;
+	if (!_description.empty()) desc << ".";
+	desc << name;
+
+	// return reference
+	return Ref::Ptr(new RefVal(_ctx, -1, desc.str()));
+}
+
+Ref::Ptr Ref::putIndex(duk_uarridx_t index, Ref::Ptr value)
+{
+	util::StackPop p(_ctx); // ref
+
+	// push current object
+	push();
+
+	// check if type os object coercible
+	if (!duk_is_object_coercible(*_ctx, -1))
+	{
+		std::stringstream smsg;
+		smsg << "Can't put index '" << index << "' in value of type '" << type() << "' (" << _description << ")";
+		throw Exception(smsg.str());
+	}
+
+	value->push();
+	duk_put_prop_index(*_ctx, -2, index);
+
+	// get prop to return
+	duk_get_prop_index(*_ctx, -1, index);
+	++p; // pop return value
+
+		 // build description
+	std::stringstream desc;
+	desc << _description;
+	if (!_description.empty()) desc << ".";
+	desc << index;
+
+	// return reference
+	return Ref::Ptr(new RefVal(_ctx, -1, desc.str()));
 }
 
 

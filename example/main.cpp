@@ -71,6 +71,17 @@ void test_core()
 	{
 		std::cout << "@@@ " << i << " - " << ctx->global()->getProp("xatest")->getIndex(i)->cast<std::string>() << std::endl;
 	}
+
+	ctx->global()->putProp("xatest", ctx->createRef(98872));
+	std::cout << "CHANGED PROP: " << ctx->global()->getProp("xatest")->get<int>() << std::endl;
+
+	auto objtest = ctx->global()->putProp("objtest", ctx->createRef(Type::OBJECT));
+	objtest->putProp("test1", ctx->createRef(12349));
+	objtest->putProp("test2", ctx->createRef("test2_value"));
+	objtest.reset();
+
+	std::cout << ctx->global()->getProp("objtest")->getProp("test2")->get<std::string>() << std::endl;
+
 	/***/
 
 	/***/

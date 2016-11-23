@@ -27,6 +27,8 @@ std::ostream& operator<< (std::ostream &os, Type t)
 	case Type::BUFFER: return os << "BUFFER";
 	case Type::POINTER: return os << "POINTER";
 	case Type::LIGHTFUNC: return os << "LIGHTFUNC";
+
+	case Type::PUSH_ARRAY: return os << "PUSH_ARRAY";
 	}
 	return os << static_cast<std::uint16_t>(t);
 }

@@ -59,11 +59,18 @@ public:
 	Type type();
 	bool isFunction();
 
+	// prop
+	bool hasProp(const std::string &name);
+	bool delProp(const std::string &name);
+
 	duk_size_t length();
 	Ref::Ptr getProp(const std::string &name);
 	Ref::Ptr getIndex(duk_uarridx_t index);
 
 	Ref::Ptr getEnum();
+
+	Ref::Ptr putProp(const std::string &name, Ref::Ptr value);
+	Ref::Ptr putIndex(duk_uarridx_t index, Ref::Ptr value);
 
 	const Ref::Ptr key() const { return _key; }
 	void setKey(Ref::Ptr key) { _key = key; }

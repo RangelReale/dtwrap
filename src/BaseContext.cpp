@@ -144,4 +144,10 @@ void BaseContext::push_ref_array()
 	duk_remove(*this, -2);
 }
 
+BaseContext::Ptr BaseContext::thisPtr()
+{
+	return BaseContext::Ptr(this);
 }
+
+}
+

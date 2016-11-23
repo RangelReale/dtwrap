@@ -17,7 +17,9 @@ enum class Type
 	OBJECT,
 	BUFFER,
 	POINTER,
-	LIGHTFUNC
+	LIGHTFUNC,
+
+	PUSH_ARRAY
 };
 
 std::string typeToString(Type t);
