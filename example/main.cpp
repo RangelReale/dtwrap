@@ -19,7 +19,7 @@ duk_ret_t native_print_add_number(duk_context *ctx)
 	return 1;
 }
 
-int raw_native_print_add_number(int value)
+int raw_native_print_add_number(int value, int value2)
 {
 	std::cout << "---- RAW_NATIVE_PRINT_ADD_NUMBER: " << value << std::endl;
 	return value + 11;
@@ -62,6 +62,11 @@ void test_core()
 		return testcfunc(14);
 	}	
 
+	var call_rcfunc = function()
+	{
+		return rtestcfunc(35, 15);
+	}	
+
 	)JS");
 
 	// register c function
@@ -74,7 +79,8 @@ void test_core()
 	// register raw c function
 	ctx->global()->putProp("rtestcfunc", ctx->createRef(&raw_native_print_add_number));
 
-	std::cout << "RAW C FUNC=" << ctx->global()->getProp("rtestcfunc")->call(81)->description() << std::endl;
+	std::cout << "RAW C FUNC=" << ctx->global()->getProp("rtestcfunc")->call(81, 90)->get<int>() << std::endl;
+	std::cout << "RAW C FUNC VIA JS=" << ctx->global()->getProp("call_rcfunc")->call()->get<int>() << std::endl;
 
 	// Enum object fields
 	auto e = dynamic_pointer_cast<RefEnum>(ctx->global()->getProp("Info")->getEnum());
