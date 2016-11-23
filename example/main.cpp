@@ -7,6 +7,18 @@
 using namespace dtwrap;
 using namespace dtwrap::util;
 
+duk_ret_t native_print_add_number(duk_context *ctx)
+{
+	std::cout << "---- NATIVE_PRINT_ADD_NUMBER PARAMS: " << duk_get_top(ctx) << std::endl;
+
+	int value = duk_require_int(ctx, 0);
+
+	std::cout << "---- NATIVE_PRINT_ADD_NUMBER: " << value << std::endl;
+
+	duk_push_int(ctx, value + 11);
+	return 1;
+}
+
 void test_core()
 {
 	auto ctx = make_context();
@@ -38,8 +50,20 @@ void test_core()
 	}
 
 	var xatest = [12, "abc", "xyz"];
+
+	var call_cfunc = function()
+	{
+		return testcfunc(14);
+	}	
+
 	)JS");
 
+	// register c function
+	ctx->global()->putProp("testcfunc", ctx->createRef(&native_print_add_number));
+
+	// call c function
+	std::cout << "C FUNC=" << ctx->global()->getProp("testcfunc")->call(55)->get<int>() << std::endl;
+	std::cout << "C FUNC VIA JS=" << ctx->global()->getProp("call_cfunc")->call()->get<int>() << std::endl;
 
 	// Enum object fields
 	auto e = dynamic_pointer_cast<RefEnum>(ctx->global()->getProp("Info")->getEnum());

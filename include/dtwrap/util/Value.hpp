@@ -174,6 +174,11 @@ struct Value<Type> {
 };
 
 
+template<>
+struct Value<duk_c_function> {
+	static void push(BaseContext::Ptr ctx, duk_c_function func) { duk_push_c_function(*ctx, func, DUK_VARARGS); }
+};
+
 //
 // ValueCast
 //
