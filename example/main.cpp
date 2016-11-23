@@ -19,6 +19,12 @@ duk_ret_t native_print_add_number(duk_context *ctx)
 	return 1;
 }
 
+int raw_native_print_add_number(int value)
+{
+	std::cout << "---- RAW_NATIVE_PRINT_ADD_NUMBER: " << value << std::endl;
+	return value + 11;
+}
+
 void test_core()
 {
 	auto ctx = make_context();
@@ -64,6 +70,11 @@ void test_core()
 	// call c function
 	std::cout << "C FUNC=" << ctx->global()->getProp("testcfunc")->call(55)->get<int>() << std::endl;
 	std::cout << "C FUNC VIA JS=" << ctx->global()->getProp("call_cfunc")->call()->get<int>() << std::endl;
+
+	// register raw c function
+	ctx->global()->putProp("rtestcfunc", ctx->createRef(&raw_native_print_add_number));
+
+	std::cout << "RAW C FUNC=" << ctx->global()->getProp("rtestcfunc")->call(81)->description() << std::endl;
 
 	// Enum object fields
 	auto e = dynamic_pointer_cast<RefEnum>(ctx->global()->getProp("Info")->getEnum());

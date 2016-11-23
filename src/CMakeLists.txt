@@ -25,6 +25,7 @@ SET( LIB_INCS
     ../include/dtwrap/util/Value.hpp
     ../include/dtwrap/util/StackPop.hpp
     ../include/dtwrap/util/Util.hpp
+    ../include/dtwrap/util/Function.hpp
 )
 
 ADD_LIBRARY(dtwrap ${LIB_SOURCES} ${LIB_INCS})

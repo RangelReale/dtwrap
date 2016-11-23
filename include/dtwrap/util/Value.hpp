@@ -3,6 +3,7 @@
 #include <dtwrap/BaseContext.hpp>
 #include <dtwrap/Exception.hpp>
 #include <dtwrap/Type.hpp>
+#include <dtwrap/util/Function.hpp>
 
 #include <cstdint>
 
@@ -177,6 +178,21 @@ struct Value<Type> {
 template<>
 struct Value<duk_c_function> {
 	static void push(BaseContext::Ptr ctx, duk_c_function func) { duk_push_c_function(*ctx, func, DUK_VARARGS); }
+};
+
+template<typename RetType, typename... Ts>
+struct Value<RetType(*)(Ts...)> {
+	static void push(BaseContext::Ptr ctx, RetType(*funcToCall)(Ts...))
+	{
+		duk_c_function evalFunc = FuncInfoHolder<RetType, Ts...>::FuncRuntime::call_native_function;
+
+		duk_push_c_function(*ctx, evalFunc, sizeof...(Ts));
+
+		//static_assert(sizeof(RetType(*)(Ts...)) == sizeof(void*), "Function pointer and data pointer are different sizes");
+		// put <internal> func_ptr prop with function pointer
+		duk_push_pointer(*ctx, reinterpret_cast<void*>(funcToCall));
+		duk_put_prop_string(*ctx, -2, "\xFF" "func_ptr");
+	}
 };
 
 //
