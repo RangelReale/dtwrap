@@ -2,6 +2,7 @@
 
 #include <dtwrap/BaseContext.hpp>
 #include <dtwrap/Type.hpp>
+#include <dtwrap/Optional.hpp>
 #include <dtwrap/util/Value.hpp>
 #include <dtwrap/util/StackPop.hpp>
 #include <dtwrap/IntrusiveRefCntPtr.h>
@@ -162,6 +163,18 @@ public:
 private:
 	duk_uint32_t _id;
 };
+
+namespace util {
+
+	template<>
+	struct Value<Ref::Ptr> {
+		static void push(BaseContext::Ptr ctx, Ref::Ptr ref)
+		{
+			ref->push();
+		}
+	};
+
+}
 
 
 }

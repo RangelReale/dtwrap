@@ -1,5 +1,6 @@
 #include <dtwrap/Context.hpp>
 #include <dtwrap/Ref.hpp>
+#include <dtwrap/Optional.hpp>
 #include <dtwrap/util/Value.hpp>
 
 #include <iostream>
@@ -23,6 +24,14 @@ int raw_native_print_add_number(int value, int value2)
 {
 	std::cout << "---- RAW_NATIVE_PRINT_ADD_NUMBER: " << value << std::endl;
 	return value + 11;
+}
+
+void raw_native_noreturn(Optional<int> x)
+{
+	if (x)
+		std::cout << "---- RAW_NATIVE_NORETURN: " << x.val() << std::endl;
+	else
+		std::cout << "---- RAW_NATIVE_NORETURN: " << "NO VALUE" << std::endl;
 }
 
 void test_core()
@@ -81,6 +90,11 @@ void test_core()
 
 	std::cout << "RAW C FUNC=" << ctx->global()->getProp("rtestcfunc")->call(81, 90)->get<int>() << std::endl;
 	std::cout << "RAW C FUNC VIA JS=" << ctx->global()->getProp("call_rcfunc")->call()->get<int>() << std::endl;
+
+	ctx->global()->putProp("rnoreturn", ctx->createRef(&raw_native_noreturn));
+
+	//ctx->global()->getProp("rnoreturn")->call(ctx->createRef(Type::UNDEFINED));
+	ctx->global()->getProp("rnoreturn")->call();
 
 	// Enum object fields
 	auto e = dynamic_pointer_cast<RefEnum>(ctx->global()->getProp("Info")->getEnum());

@@ -19,9 +19,9 @@ SET( LIB_INCS
     ../include/dtwrap/Type.hpp
     ../include/dtwrap/Exception.hpp
     ../include/dtwrap/BaseContext.hpp
-    ../include/dtwrap/ExtContext.hpp
     ../include/dtwrap/Context.hpp
     ../include/dtwrap/Ref.hpp
+    ../include/dtwrap/Optional.hpp
 
     ../include/dtwrap/util/Value.hpp
     ../include/dtwrap/util/StackPop.hpp

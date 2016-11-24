@@ -3,6 +3,7 @@
 #include <dtwrap/BaseContext.hpp>
 #include <dtwrap/Exception.hpp>
 #include <dtwrap/Type.hpp>
+#include <dtwrap/Ref.hpp>
 #include <dtwrap/util/Function.hpp>
 
 #include <cstdint>
