@@ -24,12 +24,14 @@ SET( LIB_INCS
     ../include/dtwrap/Context.hpp
     ../include/dtwrap/Ref.hpp
     ../include/dtwrap/Optional.hpp
+    ../include/dtwrap/ClassInstance.hpp
 
     ../include/dtwrap/util/Value.hpp
     ../include/dtwrap/util/StackPop.hpp
     ../include/dtwrap/util/Util.hpp
     ../include/dtwrap/util/Function.hpp
     ../include/dtwrap/util/StdFunction.hpp
+    ../include/dtwrap/util/Method.hpp
 )
 
 ADD_LIBRARY(dtwrap ${LIB_SOURCES} ${LIB_INCS})

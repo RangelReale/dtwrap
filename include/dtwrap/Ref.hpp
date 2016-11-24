@@ -178,5 +178,12 @@ namespace util {
 
 }
 
+template <typename T>
+Ref::Ptr createRef(BaseContext::Ptr ctx, T value)
+{
+	util::StackPop p(ctx); // pop pushed value
+	util::Value<T>::push(ctx, value);
+	return Ref::Ptr(new RefVal(ctx, -1));
+}
 
 }

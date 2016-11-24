@@ -28,9 +28,7 @@ public:
 	template <typename T>
 	Ref::Ptr createRef(T value)
 	{
-		util::StackPop p(thisPtr()); // pop pushed value
-		util::Value<T>::push(thisPtr(), value);
-		return Ref::Ptr(new RefVal(thisPtr(), -1));
+		return ::createRef(thisPtr(), value);
 	}
 private:
 	duk_context *_ctx;

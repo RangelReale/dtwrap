@@ -4,8 +4,10 @@
 #include <dtwrap/Exception.hpp>
 #include <dtwrap/Type.hpp>
 #include <dtwrap/Ref.hpp>
+#include <dtwrap/ClassInstance.hpp>
 #include <dtwrap/util/Function.hpp>
 #include <dtwrap/util/StdFunction.hpp>
+#include <dtwrap/util/Method.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -20,11 +22,13 @@ namespace util {
 template <typename T>
 struct Value
 {
+	/*
 	static bool is(BaseContext::Ptr ctx, duk_idx_t index);
 	static T require(BaseContext::Ptr ctx, duk_idx_t index);
 	static T get(BaseContext::Ptr ctx, duk_idx_t index);
 	static T to(BaseContext::Ptr ctx, duk_idx_t index);
 	static void push(BaseContext::Ptr ctx, const T& value);
+	*/
 };
 
 template<>
@@ -183,6 +187,14 @@ struct Value<Type> {
 	}
 };
 
+template<class T>
+struct Value<dtwrap::ClassInstance<T>> {
+	static void push(BaseContext::Ptr ctx, const dtwrap::ClassInstance<T> value)
+	{
+		std::cout << "OK";
+	}
+};
+
 
 template<>
 struct Value<duk_c_function> {
@@ -225,6 +237,29 @@ struct Value<std::function<RetType(Ts...)>> {
 		duk_set_finalizer(*ctx, -2);
 	}
 };
+
+template<class Cls, typename RetType, typename... Ts>
+struct Value<RetType(Cls::*)(Ts...)> {
+	static void push(BaseContext::Ptr ctx, RetType(Cls::*methodToCall)(Ts...))
+	{
+		typedef MethodInfoHolder<Cls, RetType, Ts...> MethodInfo;
+
+		//duk_c_function evalFunc = MethodInfoHolder<Cls, RetType, Ts...>::MethodRuntime::call_native_function;
+
+		duk_push_c_function(*ctx, MethodInfo::MethodRuntime::call_native_function, sizeof...(Ts));
+
+		auto nf = new MethodInfo::MethodHolder{ methodToCall };
+
+		//static_assert(sizeof(RetType(*)(Ts...)) == sizeof(void*), "Function pointer and data pointer are different sizes");
+		// put <internal> func_ptr prop with function pointer
+		duk_push_pointer(*ctx, reinterpret_cast<void*>(nf));
+		duk_put_prop_string(*ctx, -2, "\xFF" "method_ptr");
+
+		duk_push_c_function(*ctx, MethodInfo::MethodRuntime::finalizer_function, 1);
+		duk_set_finalizer(*ctx, -2);
+	}
+};
+
 
 // Try to support lambdas (NOT WORKING)
 // http://meh.schizofreni.co/programming/magic/2013/01/23/function-pointer-from-lambda.html

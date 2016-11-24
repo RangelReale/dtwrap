@@ -1,6 +1,13 @@
+#ifdef WIN32
+#define _CRTDBG_MAP_ALLOC  
+#include <stdlib.h>  
+#include <crtdbg.h> 
+#endif
+
 #include <dtwrap/Context.hpp>
 #include <dtwrap/Ref.hpp>
 #include <dtwrap/Optional.hpp>
+#include <dtwrap/ClassInstance.hpp>
 #include <dtwrap/util/Value.hpp>
 
 #include <iostream>
@@ -175,15 +182,135 @@ void test_core()
 	duk_dump_context_stdout(*ctx);
 }
 
+
+class TClass1
+{
+public:
+	typedef std::shared_ptr<TClass1> Ptr;
+
+	TClass1(int v1, int v2) : _v1(v1), _v2(v2) {}
+
+	int calc(int v3) { 
+		return _v1 + _v2 + v3; 
+	}
+private:
+	int _v1, _v2;
+};
+
+namespace dtwrap {
+
+	template<>
+	struct ClassInstance<TClass1>
+	{
+		ClassInstance(const TClass1 *c) : _c() {}
+
+		operator TClass1*()
+		{
+			return _c;
+		}
+
+		operator TClass1 const* ()
+		{
+			return _c;
+		}
+
+		TClass1 *_c;
+	};
+
+}
+
+namespace dtwrap {
+namespace util {
+
+	/*
+	template<>
+	struct Value<TClass1*> {
+		static void push(BaseContext::Ptr ctx, TClass1* value)
+		{
+			Ref::Ptr obj(createRef(ctx, Type::OBJECT));
+
+			obj->push();
+
+			// put instance in object's obj_ptr
+			duk_push_pointer(*ctx, reinterpret_cast<void*>(value));
+			duk_put_prop_string(*ctx, -2, "\xFF" "obj_ptr");
+
+			// add methods
+			obj->putProp("calc", createRef(ctx, &TClass1::calc));
+
+			// push finalizer
+			duk_push_c_function(*ctx, destruct, 1);
+			duk_set_finalizer(*ctx, -2);
+
+			// leave pushed object on the stack
+		}
+
+		static duk_ret_t destruct(duk_context *ctx)
+		{
+			duk_get_prop_string(ctx, -1, "\xFF" "obj_ptr");
+			void* op_void = duk_require_pointer(ctx, -1);
+			if (op_void == NULL) {
+				duk_error(ctx, DUK_RET_TYPE_ERROR, "what even");
+				return DUK_RET_TYPE_ERROR;
+			}
+			duk_pop(ctx);
+
+			TClass1 *obj = reinterpret_cast<TClass1*>(op_void);
+			delete obj;
+
+			// set pointer as null
+			duk_push_pointer(ctx, NULL);
+			duk_put_prop_string(ctx, -2, "\xFF" "obj_ptr");
+
+			return 0;
+		}
+	};
+	*/
+
+} }
+
+
+
+void test_class()
+{
+	auto ctx = make_context();
+
+	auto c = new TClass1(5, 10);
+
+	//auto cc = ClassInstance<TClass1>(NULL);
+	//c = cc;
+
+	//auto cl = ctx->createRef(ClassInstance<TClass1>(c));
+	auto cl = ctx->createRef(c);
+	//std::cout << cl->callProp("calc", 10, 20)->get<int>() << std::endl;
+
+	/*
+	auto ci = TClass1_ClassInstance();
+	ci.reg(ctx, c);
+
+	//auto cl = ctx->createRef(c);
+	*/
+
+	std::cout << "REF AMOUNT: " << ctx->refCount() << std::endl;
+	std::cout << "REF MAX: " << ctx->refMax() << std::endl;
+
+	duk_dump_context_stdout(*ctx);
+}
+
 int main(int argc, char *argv[])
 {
 	try
 	{
-		test_core();
+		//test_core();
+		test_class();
 	}
 	catch (std::exception &e) {
 		std::cout << "ERROR: " << e.what() << std::endl;
 	}
+
+#ifdef WIN32
+	_CrtDumpMemoryLeaks();
+#endif
 
 	std::cout << "PRESS ANY KEY TO CONTINUE";
 	std::cin.ignore();
