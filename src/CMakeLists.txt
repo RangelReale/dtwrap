@@ -1,3 +1,5 @@
+add_definitions(-DDUK_OPT_CPP_EXCEPTIONS)
+
 SET( LIB_SOURCES
     ../duktape/duktape.c
     
@@ -31,3 +33,5 @@ SET( LIB_INCS
 )
 
 ADD_LIBRARY(dtwrap ${LIB_SOURCES} ${LIB_INCS})
+
+SET_SOURCE_FILES_PROPERTIES( ../duktape/duktape.c PROPERTIES LANGUAGE CXX )

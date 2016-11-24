@@ -155,7 +155,13 @@ template<>
 struct Value<std::string> {
 	static bool is(BaseContext::Ptr ctx, duk_idx_t index) { return static_cast<bool>(duk_is_string(*ctx, index) != 0); }
 	static std::string require(BaseContext::Ptr ctx, duk_idx_t index) { return std::string(duk_require_string(*ctx, index)); }
-	static std::string get(BaseContext::Ptr ctx, duk_idx_t index) { return std::string(duk_get_string(*ctx, index)); }
+	static std::string get(BaseContext::Ptr ctx, duk_idx_t index) { 
+		duk_size_t len;
+		const char* ret = duk_get_lstring(*ctx, index, &len);
+		if (!ret) 
+			return std::string();
+		return std::string(ret, len); 
+	}
 	static std::string to(BaseContext::Ptr ctx, duk_idx_t index) { return std::string(duk_safe_to_string(*ctx, index)); }
 	static void push(BaseContext::Ptr ctx, const std::string& value) { duk_push_string(*ctx, value.c_str()); }
 };
