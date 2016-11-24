@@ -97,11 +97,14 @@ void test_core()
 	//ctx->global()->getProp("rnoreturn")->call(ctx->createRef(Type::UNDEFINED));
 	ctx->global()->getProp("rnoreturn")->call();
 
+	std::cout << "@@STDFUNCTION" << std::endl;
 	std::function<int(int, int)> f_raw_native_print_add_number = raw_native_print_add_number;
 
 	ctx->global()->putProp("rstdfunc", ctx->createRef(f_raw_native_print_add_number));
 	ctx->global()->getProp("rstdfunc")->call(15, 20);
 
+	// lambdas not supported
+	//std::cout << "@@LAMBDA" << std::endl;
 	//ctx->global()->putProp("rlamba", ctx->createRef([](int x) { std::cout << "LAMBDA " << x << std::endl; }));
 	//ctx->global()->getProp("rlamba")->call(488);
 

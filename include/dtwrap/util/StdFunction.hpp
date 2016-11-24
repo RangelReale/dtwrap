@@ -49,6 +49,28 @@ struct StdFuncInfoHolder
 			return std::is_void<RetType>::value ? 0 : 1;
 		}
 
+		static duk_ret_t finalizer_function(duk_context *ctx)
+		{
+			auto bctx = make_context_base(ctx);
+
+			duk_get_prop_string(ctx, -1, "\xFF" "stdfunc_ptr");
+			void* fp_void = duk_require_pointer(ctx, -1);
+			if (fp_void == NULL) {
+				duk_error(ctx, DUK_RET_TYPE_ERROR, "what even");
+				return DUK_RET_TYPE_ERROR;
+			}
+			duk_pop(ctx);
+
+			FuncType* funcToCall = reinterpret_cast<FuncType*>(fp_void);
+			delete funcToCall;
+
+			// set pointer as null
+			duk_push_pointer(ctx, NULL);
+			duk_put_prop_string(ctx, -2, "\xFF" "stdfunc_ptr");
+
+			return 0;
+		}
+
 		template<size_t... N>
 		static std::tuple<Ts...> get_stack_values_helper(BaseContext::Ptr ctx, std::index_sequence<N...>)
 		{

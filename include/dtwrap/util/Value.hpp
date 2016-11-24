@@ -200,18 +200,59 @@ struct Value<RetType(*)(Ts...)> {
 
 template<typename RetType, typename... Ts>
 struct Value<std::function<RetType(Ts...)>> {
-	static void push(BaseContext::Ptr ctx, std::function<RetType(Ts...)> &funcToCall)
+	static void push(BaseContext::Ptr ctx, std::function<RetType(Ts...)> funcToCall)
 	{
 		duk_c_function evalFunc = StdFuncInfoHolder<RetType, Ts...>::FuncRuntime::call_native_function;
+		duk_c_function finFunc = StdFuncInfoHolder<RetType, Ts...>::FuncRuntime::finalizer_function;
 
 		duk_push_c_function(*ctx, evalFunc, sizeof...(Ts));
 
 		//static_assert(sizeof(RetType(*)(Ts...)) == sizeof(void*), "Function pointer and data pointer are different sizes");
 		// put <internal> func_ptr prop with function pointer
-		duk_push_pointer(*ctx, reinterpret_cast<void*>(&funcToCall));
+
+		auto nf = new std::function<RetType(Ts...)>(funcToCall);
+
+		duk_push_pointer(*ctx, reinterpret_cast<void*>(nf));
 		duk_put_prop_string(*ctx, -2, "\xFF" "stdfunc_ptr");
+
+		duk_push_c_function(*ctx, finFunc, 1);
+		duk_set_finalizer(*ctx, -2);
 	}
 };
+
+// Try to support lambdas (NOT WORKING)
+// http://meh.schizofreni.co/programming/magic/2013/01/23/function-pointer-from-lambda.html
+// http://stackoverflow.com/questions/13358672/how-to-convert-a-lambda-to-an-stdfunction-using-templates
+
+
+/*
+template <typename Function>
+struct function_traits
+	: public function_traits<decltype(&Function::operator())>
+{};
+
+template <typename ClassType, typename ReturnType, typename... Args>
+struct function_traits<ReturnType(ClassType::*)(Args...) const>
+{
+	typedef ReturnType(*pointer)(Args...);
+	typedef std::function<ReturnType(Args...)> function;
+};
+
+template <typename Function>
+typename function_traits<Function>::pointer
+to_function_pointer(Function& lambda)
+{
+	return static_cast<typename function_traits<Function>::pointer>(lambda);
+}
+
+template <typename Function>
+typename function_traits<Function>::function
+to_function(Function& lambda)
+{
+	return static_cast<typename function_traits<Function>::function>(lambda);
+}
+*/
+
 
 
 //
