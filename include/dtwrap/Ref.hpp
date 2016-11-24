@@ -15,6 +15,8 @@
 namespace dtwrap
 {
 
+class RefEnum;
+
 class Ref : public ThreadSafeRefCountedBase<Ref>
 {
 public:
@@ -68,7 +70,7 @@ public:
 	Ref::Ptr getProp(const std::string &name);
 	Ref::Ptr getIndex(duk_uarridx_t index);
 
-	Ref::Ptr getEnum();
+	IntrusiveRefCntPtr<RefEnum> getEnum();
 
 	Ref::Ptr putProp(const std::string &name, Ref::Ptr value);
 	Ref::Ptr putIndex(duk_uarridx_t index, Ref::Ptr value);
@@ -152,7 +154,7 @@ private:
 class RefEnum : public Ref
 {
 public:
-	//typedef IntrusiveRefCntPtr<RefEnum> RefEnumPtr;
+	typedef IntrusiveRefCntPtr<RefEnum> RefEnumPtr;
 
 	RefEnum(BaseContext::Ptr ctx, duk_idx_t index, const std::string &description = "");
 	~RefEnum();

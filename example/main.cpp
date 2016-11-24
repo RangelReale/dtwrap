@@ -110,7 +110,7 @@ void test_core()
 
 
 	// Enum object fields
-	auto e = dynamic_pointer_cast<RefEnum>(ctx->global()->getProp("Info")->getEnum());
+	auto e = ctx->global()->getProp("Info")->getEnum();
 	
 	std::cout << "=======" << std::endl;
 	for (Ref::Ptr i = e->next(); i; i = e->next())

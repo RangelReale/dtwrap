@@ -110,11 +110,11 @@ Ref::Ptr Ref::getIndex(duk_uarridx_t index)
 	return Ref::Ptr(new RefVal(_ctx, -1, desc.str()));
 }
 
-Ref::Ptr Ref::getEnum()
+IntrusiveRefCntPtr<RefEnum> Ref::getEnum()
 {
 	util::StackPop p(_ctx);
 	push();
-	return Ref::Ptr(new RefEnum(_ctx, -1, _description));
+	return RefEnum::RefEnumPtr(new RefEnum(_ctx, -1, _description));
 }
 
 Ref::Ptr Ref::putProp(const std::string &name, Ref::Ptr value)
