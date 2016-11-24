@@ -5,8 +5,10 @@
 #include <dtwrap/Type.hpp>
 #include <dtwrap/Ref.hpp>
 #include <dtwrap/util/Function.hpp>
+#include <dtwrap/util/StdFunction.hpp>
 
 #include <cstdint>
+#include <functional>
 
 namespace dtwrap {
 namespace util {
@@ -195,6 +197,22 @@ struct Value<RetType(*)(Ts...)> {
 		duk_put_prop_string(*ctx, -2, "\xFF" "func_ptr");
 	}
 };
+
+template<typename RetType, typename... Ts>
+struct Value<std::function<RetType(Ts...)>> {
+	static void push(BaseContext::Ptr ctx, std::function<RetType(Ts...)> &funcToCall)
+	{
+		duk_c_function evalFunc = StdFuncInfoHolder<RetType, Ts...>::FuncRuntime::call_native_function;
+
+		duk_push_c_function(*ctx, evalFunc, sizeof...(Ts));
+
+		//static_assert(sizeof(RetType(*)(Ts...)) == sizeof(void*), "Function pointer and data pointer are different sizes");
+		// put <internal> func_ptr prop with function pointer
+		duk_push_pointer(*ctx, reinterpret_cast<void*>(&funcToCall));
+		duk_put_prop_string(*ctx, -2, "\xFF" "stdfunc_ptr");
+	}
+};
+
 
 //
 // ValueCast

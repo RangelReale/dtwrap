@@ -4,6 +4,7 @@
 #include <dtwrap/util/Value.hpp>
 
 #include <iostream>
+#include <functional>
 
 using namespace dtwrap;
 using namespace dtwrap::util;
@@ -95,6 +96,15 @@ void test_core()
 
 	//ctx->global()->getProp("rnoreturn")->call(ctx->createRef(Type::UNDEFINED));
 	ctx->global()->getProp("rnoreturn")->call();
+
+	std::function<int(int, int)> f_raw_native_print_add_number = raw_native_print_add_number;
+
+	ctx->global()->putProp("rstdfunc", ctx->createRef(f_raw_native_print_add_number));
+	ctx->global()->getProp("rstdfunc")->call(15, 20);
+
+	//ctx->global()->putProp("rlamba", ctx->createRef([](int x) { std::cout << "LAMBDA " << x << std::endl; }));
+	//ctx->global()->getProp("rlamba")->call(488);
+
 
 	// Enum object fields
 	auto e = dynamic_pointer_cast<RefEnum>(ctx->global()->getProp("Info")->getEnum());
