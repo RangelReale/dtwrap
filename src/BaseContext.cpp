@@ -114,6 +114,21 @@ duk_uint32_t BaseContext::refCount()
 	return amount;
 }
 
+duk_uint32_t BaseContext::refMax()
+{
+	push_ref_array();
+
+	// find current max from array[0]
+	duk_get_prop_index(*this, -1, 0);
+	duk_uint32_t max = duk_get_uint(*this, -1);
+	duk_pop(*this); // pop id
+
+	// pop ref array
+	duk_pop(*this);
+
+	return max-2; // 0 and 1 are special
+}
+
 void BaseContext::push_ref_array()
 {
 	static const char* DTWRAP_REF = "dtwrap_ref";

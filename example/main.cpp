@@ -170,6 +170,7 @@ void test_core()
 	/***/
 
 	std::cout << "REF AMOUNT: " << ctx->refCount() << std::endl;
+	std::cout << "REF MAX: " << ctx->refMax() << std::endl;
 
 	duk_dump_context_stdout(*ctx);
 }
@@ -179,7 +180,6 @@ int main(int argc, char *argv[])
 	try
 	{
 		test_core();
-		//test_readobj();
 	}
 	catch (std::exception &e) {
 		std::cout << "ERROR: " << e.what() << std::endl;

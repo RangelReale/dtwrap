@@ -30,6 +30,12 @@ TEST_CASE("Read variables", "[ref]") {
 
 	CHECK(ctx->global()->getProp("infofunc")->isFunction() == true);
 
+	ctx->global()->putProp("localvar", ctx->createRef(415));
+	CHECK(ctx->global()->getProp("localvar")->get<int>() == 415);
+
+	ctx->global()->putProp("localvar2", ctx->createRef("lvarvalue"));
+	CHECK(ctx->global()->getProp("localvar2")->get<std::string>() == "lvarvalue");
+
 	// must not leave anything on the stack
 	CHECK(duk_get_top(*ctx) == 0);
 

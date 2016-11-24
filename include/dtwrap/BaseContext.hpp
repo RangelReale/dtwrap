@@ -28,6 +28,7 @@ public:
 	duk_uint32_t ref(duk_idx_t index);
 	void unref(duk_uint32_t id);
 	duk_uint32_t refCount();
+	duk_uint32_t refMax();
 protected:
 	BaseContext::Ptr thisPtr();
 private:
