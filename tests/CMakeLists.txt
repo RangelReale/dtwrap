@@ -1,6 +1,7 @@
 include_directories(.)
 add_executable(dtwrap_test 
 	test.cpp
+	value.cpp
 	readvar.cpp
 	loop.cpp
 	function.cpp

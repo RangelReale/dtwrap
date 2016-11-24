@@ -36,6 +36,22 @@ TEST_CASE("Read variables", "[ref]") {
 	ctx->global()->putProp("localvar2", ctx->createRef("lvarvalue"));
 	CHECK(ctx->global()->getProp("localvar2")->get<std::string>() == "lvarvalue");
 
+	{
+		auto objtest = ctx->global()->putProp("objtest", ctx->createRef(Type::OBJECT));
+		objtest->putProp("test1", ctx->createRef(12349));
+		objtest->putProp("test2", ctx->createRef("test2_value"));
+	}
+	CHECK(ctx->global()->getProp("objtest")->getProp("test1")->get<int>() == 12349);
+	CHECK(ctx->global()->getProp("objtest")->getProp("test2")->get<std::string>() == "test2_value");
+
+	{
+		auto arrtest = ctx->global()->putProp("arrtest", ctx->createRef(Type::PUSH_ARRAY));
+		arrtest->putIndex(0, ctx->createRef(12349));
+		arrtest->putIndex(1, ctx->createRef("test2_value"));
+	}
+	CHECK(ctx->global()->getProp("arrtest")->getIndex(0)->get<int>() == 12349);
+	CHECK(ctx->global()->getProp("arrtest")->getIndex(1)->get<std::string>() == "test2_value");
+
 	// must not leave anything on the stack
 	CHECK(duk_get_top(*ctx) == 0);
 
