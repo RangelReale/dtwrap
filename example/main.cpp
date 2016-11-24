@@ -197,99 +197,45 @@ private:
 	int _v1, _v2;
 };
 
-namespace dtwrap {
+class ClassInstance_TClass1 : public ClassInstance<TClass1>
+{
+public:
+	using ClassInstance::ClassInstance;
 
-	template<>
-	struct ClassInstance<TClass1>
+	void registerObject(BaseContext::Ptr ctx, Ref::Ptr obj) override
 	{
-		ClassInstance(const TClass1 *c) : _c() {}
+		// add methods
+		obj->putProp("calc", createRef(ctx, &TClass1::calc));
+	}
+};
 
-		operator TClass1*()
-		{
-			return _c;
-		}
+/*
+class ClassInstance_TClass1_Ptr : public ClassInstance<TClass1::Ptr>
+{
+public:
+	using ClassInstance::ClassInstance;
 
-		operator TClass1 const* ()
-		{
-			return _c;
-		}
+	void registerObject(BaseContext::Ptr ctx, Ref::Ptr obj) override
+	{
+		// add methods
+		obj->putProp("calc", createRef(ctx, &TClass1::calc));
+	}
+};
+*/
 
-		TClass1 *_c;
-	};
+CLASSINSTANCE_REGISTER(TClass1, ClassInstance_TClass1)
 
-}
-
-namespace dtwrap {
-namespace util {
-
-	/*
-	template<>
-	struct Value<TClass1*> {
-		static void push(BaseContext::Ptr ctx, TClass1* value)
-		{
-			Ref::Ptr obj(createRef(ctx, Type::OBJECT));
-
-			obj->push();
-
-			// put instance in object's obj_ptr
-			duk_push_pointer(*ctx, reinterpret_cast<void*>(value));
-			duk_put_prop_string(*ctx, -2, "\xFF" "obj_ptr");
-
-			// add methods
-			obj->putProp("calc", createRef(ctx, &TClass1::calc));
-
-			// push finalizer
-			duk_push_c_function(*ctx, destruct, 1);
-			duk_set_finalizer(*ctx, -2);
-
-			// leave pushed object on the stack
-		}
-
-		static duk_ret_t destruct(duk_context *ctx)
-		{
-			duk_get_prop_string(ctx, -1, "\xFF" "obj_ptr");
-			void* op_void = duk_require_pointer(ctx, -1);
-			if (op_void == NULL) {
-				duk_error(ctx, DUK_RET_TYPE_ERROR, "what even");
-				return DUK_RET_TYPE_ERROR;
-			}
-			duk_pop(ctx);
-
-			TClass1 *obj = reinterpret_cast<TClass1*>(op_void);
-			delete obj;
-
-			// set pointer as null
-			duk_push_pointer(ctx, NULL);
-			duk_put_prop_string(ctx, -2, "\xFF" "obj_ptr");
-
-			return 0;
-		}
-	};
-	*/
-
-} }
-
-
+//CLASSINSTANCE_REGISTER(TClass1::Ptr, ClassInstance_TClass1_Ptr)
 
 void test_class()
 {
 	auto ctx = make_context();
 
+	//auto c = TClass1::Ptr(new TClass1(5, 10));
 	auto c = new TClass1(5, 10);
 
-	//auto cc = ClassInstance<TClass1>(NULL);
-	//c = cc;
-
-	//auto cl = ctx->createRef(ClassInstance<TClass1>(c));
 	auto cl = ctx->createRef(c);
-	//std::cout << cl->callProp("calc", 10, 20)->get<int>() << std::endl;
-
-	/*
-	auto ci = TClass1_ClassInstance();
-	ci.reg(ctx, c);
-
-	//auto cl = ctx->createRef(c);
-	*/
+	std::cout << cl->callProp("calc", 10, 20)->get<int>() << std::endl;
 
 	std::cout << "REF AMOUNT: " << ctx->refCount() << std::endl;
 	std::cout << "REF MAX: " << ctx->refMax() << std::endl;

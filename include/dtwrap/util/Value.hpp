@@ -4,7 +4,6 @@
 #include <dtwrap/Exception.hpp>
 #include <dtwrap/Type.hpp>
 #include <dtwrap/Ref.hpp>
-#include <dtwrap/ClassInstance.hpp>
 #include <dtwrap/util/Function.hpp>
 #include <dtwrap/util/StdFunction.hpp>
 #include <dtwrap/util/Method.hpp>
@@ -186,15 +185,6 @@ struct Value<Type> {
 		}
 	}
 };
-
-template<class T>
-struct Value<dtwrap::ClassInstance<T>> {
-	static void push(BaseContext::Ptr ctx, const dtwrap::ClassInstance<T> value)
-	{
-		std::cout << "OK";
-	}
-};
-
 
 template<>
 struct Value<duk_c_function> {
