@@ -197,7 +197,7 @@ private:
 	int _v1, _v2;
 };
 
-class ClassInstance_TClass1 : public ClassInstance<TClass1>
+class ClassInstance_TClass1 : public ClassInstance<TClass1*>
 {
 public:
 	using ClassInstance::ClassInstance;
@@ -208,12 +208,18 @@ public:
 		obj->putProp("calc", createRef(ctx, &TClass1::calc));
 	}
 };
+
+CLASSINSTANCE_REGISTER(TClass1*, ClassInstance_TClass1)
+
 
 /*
 class ClassInstance_TClass1_Ptr : public ClassInstance<TClass1::Ptr>
 {
 public:
-	using ClassInstance::ClassInstance;
+	//using ClassInstance::ClassInstance;
+	ClassInstance_TClass1_Ptr(TClass1::Ptr value) :
+		ClassInstance(value) {}
+
 
 	void registerObject(BaseContext::Ptr ctx, Ref::Ptr obj) override
 	{
@@ -221,11 +227,9 @@ public:
 		obj->putProp("calc", createRef(ctx, &TClass1::calc));
 	}
 };
+
+CLASSINSTANCE_REGISTER(TClass1::Ptr, ClassInstance_TClass1_Ptr)
 */
-
-CLASSINSTANCE_REGISTER(TClass1, ClassInstance_TClass1)
-
-//CLASSINSTANCE_REGISTER(TClass1::Ptr, ClassInstance_TClass1_Ptr)
 
 void test_class()
 {

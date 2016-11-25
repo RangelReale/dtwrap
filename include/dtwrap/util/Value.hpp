@@ -18,7 +18,7 @@ namespace util {
 // Value
 //
 
-template <typename T>
+template <typename T, typename = void>
 struct Value
 {
 	/*
