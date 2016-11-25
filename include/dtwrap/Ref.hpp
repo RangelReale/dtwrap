@@ -2,10 +2,10 @@
 
 #include <dtwrap/BaseContext.hpp>
 #include <dtwrap/Type.hpp>
-#include <dtwrap/Optional.hpp>
 #include <dtwrap/util/Value.hpp>
 #include <dtwrap/util/StackPop.hpp>
 #include <dtwrap/IntrusiveRefCntPtr.h>
+#include <dtwrap/Optional.hpp>
 
 #include <duktape.h>
 

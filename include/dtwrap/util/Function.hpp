@@ -1,6 +1,6 @@
 #pragma once
 
-#include <dtwrap/BaseContext.hpp>
+#include <dtwrap/Context.hpp>
 #include <dtwrap/util/Value.hpp>
 
 #include <tuple>
@@ -62,7 +62,7 @@ struct FuncInfoHolder
 		static std::tuple<Ts...> get_stack_values(BaseContext::Ptr ctx)
 		{
 			constexpr std::size_t num_args = sizeof...(Ts);
-			return get_stack_values_helper(ctx, typename std::make_index_sequence<num_args>::type());
+			return get_stack_values_helper(ctx, typename std::make_index_sequence<num_args>{});
 		}
 
 		// this mess is to support functions with void return values
@@ -73,7 +73,7 @@ struct FuncInfoHolder
 			// so we typedef it to force ArgStorage<RetType> to compile and run the asserts
 			//typedef typename dukglue::types::ArgStorage<RetType>::type ValidateReturnType;
 
-			RetType return_val = apply_fp_helper(funcToCall, typename std::make_index_sequence<sizeof...(Ts)>::type(), args);
+			RetType return_val = apply_fp_helper(funcToCall, typename std::make_index_sequence<sizeof...(Ts)>{}, args);
 
 			Value<RetType>::push(ctx, return_val);
 		}
@@ -81,7 +81,7 @@ struct FuncInfoHolder
 		template<typename Dummy = RetType>
 		static typename std::enable_if<std::is_void<Dummy>::value>::type actually_call(BaseContext::Ptr ctx, RetType(*funcToCall)(Ts...), std::tuple<Ts...> args)
 		{
-			apply_fp_helper(funcToCall, typename std::make_index_sequence<sizeof...(Ts)>::type(), args);
+			apply_fp_helper(funcToCall, typename std::make_index_sequence<sizeof...(Ts)>{}, args);
 		}
 
 		// function pointer
@@ -91,6 +91,21 @@ struct FuncInfoHolder
 			return pf(std::forward<Ts>(std::get<Indexes>(tup))...);
 		}
 	};
+};
+
+template<typename RetType, typename... Ts>
+struct Value<RetType(*)(Ts...)> {
+	static void push(BaseContext::Ptr ctx, RetType(*funcToCall)(Ts...))
+	{
+		duk_c_function evalFunc = FuncInfoHolder<RetType, Ts...>::FuncRuntime::call_native_function;
+
+		duk_push_c_function(*ctx, evalFunc, sizeof...(Ts));
+
+		//static_assert(sizeof(RetType(*)(Ts...)) == sizeof(void*), "Function pointer and data pointer are different sizes");
+		// put <internal> func_ptr prop with function pointer
+		duk_push_pointer(*ctx, reinterpret_cast<void*>(funcToCall));
+		duk_put_prop_string(*ctx, -2, "\xFF" "func_ptr");
+	}
 };
 
 } }

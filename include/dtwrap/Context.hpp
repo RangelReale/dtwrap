@@ -38,12 +38,12 @@ private:
 };
 
 template <class ...Ts>
-Context::Ptr make_context(Ts... args) {
+Context::Ptr make_context(Ts&&... args) {
 	return Context::Ptr(new Context(std::forward<Ts>(args)...));
 }
 
 template <class ...Ts>
-BaseContext::Ptr make_context_base(Ts... args) {
+BaseContext::Ptr make_context_base(Ts&&... args) {
 	return BaseContext::Ptr(new Context(std::forward<Ts>(args)...));
 }
 

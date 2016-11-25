@@ -1,6 +1,8 @@
 #include <catch.hpp>
 
 #include <dtwrap/Context.hpp>
+#include <dtwrap/util/Function.hpp>
+#include <dtwrap/util/StdFunction.hpp>
 
 #include <functional>
 

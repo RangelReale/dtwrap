@@ -2,6 +2,8 @@
 #include <dtwrap/Ref.hpp>
 #include <dtwrap/Optional.hpp>
 #include <dtwrap/util/Value.hpp>
+#include <dtwrap/util/Function.hpp>
+#include <dtwrap/util/StdFunction.hpp>
 
 #include <iostream>
 #include <functional>
